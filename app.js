@@ -54,7 +54,7 @@ app.post("/",function(request,response){
             let data = await res.json(); // Parse json into js object
             console.log(res.status);
             // Using spread operator ...
-            data = { ...data, statusCode: res.status }; // Add statusCode property to data object
+            data = { ...data, statusCode: res.status}; // Add statusCode property to data object
             console.log(apiUrls[api]);
             console.log(data);
             // console.log(data.sta)
@@ -69,8 +69,10 @@ app.post("/",function(request,response){
       <html>
         <head>
           <title>Weather App</title>
+          <link rel="icon" type="image/png" href="./assets/favicon.png" sizes="16x16">
           <style>
             body{
+              padding : 10px;
               display: flex;
               flex-direction: column;
               align-items :center;
@@ -78,81 +80,175 @@ app.post("/",function(request,response){
               gap:20px;
             }
 
-            .cityBar{
-              align-text:center;
-            }
+          .weather-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+          }
 
+          .weather-box {
+            flex: 0 0 calc(50% - 20px); /* adjust the width to 50% minus gap */
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
+
+          /* Add media queries for responsiveness */
+          @media (max-width: 768px) {
             .weather-box {
-              display: flex;
-              flex-direction: row;
-              gap:20px;
-              width: 50%;
+              flex: 0 0 calc(100% - 20px); /* on smaller screens, make each box full width */
+            }
+          }
+
+          @media (min-width: 768px) and (max-width: 1200px) {
+            .weather-box {
+              flex: 0 0 calc(50% - 20px); /* on medium screens, make each box 50% width */
+            }
+          }
+
+          @media (min-width: 1200px) {
+            .weather-container {
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              gap: 20px;
+            }
+            .weather-box {
               margin: 20px;
               padding: 20px;
-              border: 1px solid #ccc;
               border-radius: 10px;
               box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             }
+          }
+
+
+          .weather-box h2 {
+            margin-top: 0;
+          }
+
+          .weather-details {
+            margin-top: 20px;
+          }
+
+          .weather-details p {
+            margin-bottom: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+          }
+
+          .weather-details b {
+            font-weight: bold;
+            color: #00698f;
+          }
+
+          .temperature {
+            font-size: 26px;
+            font-weight: bold;
+            color: #00698f;
+          }
+
+          .weather-condition {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+          }
+
+          .weather-description {
+            font-size: 20px;
+            color: #666;
+          }
+
+          .weather-image{
+            width:96px;
+            height:76px;
+          }
+
+          .error-image {
+            object-fit: contain;
+            border-radius: 12px;
+          }
+
+          .cityBar{
+            align-text:center;
+          }
+
           </style>
         </head>
         <body>
           <div class = "cityBar">
-          <h1>Weather in ${cityName}</h1>
+            <h1>Weather in ${cityName}</h1> 
+            <form action = "/weatherapp" method = "post">
+              <button type="submit" class="fa-solid fa-magnifying-glass" id="searchBtn"></button>
+            </form>
           </div>
-
-          <div class="weather-box">
-            <h2>OpenWeatherMap</h2>
-            ${weatherData.openWeatherMap.statusCode === 200 ? 
-              `<img width="72px" height="96px" src="https://openweathermap.org/img/wn/${weatherData.openWeatherMap.weather[0].icon}@2x.png>
-              <p>Temperature: ${weatherData.openWeatherMap.main.temp}°C</p>
-              <p>Weather: ${weatherData.openWeatherMap.weather[0].main}</p>
-              <p>Description: ${weatherData.openWeatherMap.weather[0].description}</p>` 
-              : 
-              `<img src="./assets/error-image.png" alt="Api Request Unsuccessful">`
-            }
-          </div>
-
-        
-          <div class="weather-box">
-            <h2>WeatherBit</h2>
-            ${weatherData.weatherBit.statusCode === 200 ?
-            `<img width = "72px" height = "96px"  src=https://www.weatherbit.io/static/img/icons/${weatherData.weatherBit.data[0].weather.icon}.png>
-            <p>Temperature: ${weatherData.weatherBit.data[0].temp}°C</p>
-            <p>Weather: ${weatherData.weatherBit.data[0].weather.description}</p>
-            <p>AQI: ${weatherData.weatherBit.data[0].aqi}</p>` : `<img src = "./assets/error-image.png" alt = "Api Request Unsuccessful ">`
-            }   
-          </div>
-
-          <div class = "weather-box">
-            <h2> Tomorrow API</h2>
-            ${weatherData.tomorrow.statusCode === 200 ?
-            `<img  width = "72px" height = "96px" src ="./assets/${weatherData.tomorrow.timelines.minutely[0].values.weatherCode}.png">
-            <p>Temperature: ${weatherData.tomorrow.timelines.minutely[0].values.temperature}°C</p>
-            <p>Humidity: ${weatherData.tomorrow.timelines.minutely[0].values.humidity}</p>
-            <p>WindSpeed: ${weatherData.tomorrow.timelines.minutely[0].values.windSpeed}</p>` 
-            : `<img src = "./assets/error-image.png" alt = "Api Request Unsuccessful">`
-            }   
-          </div>
+          
+          <div class =  "weather-container">
+            <div class="weather-box">
+              <h2>OpenWeatherMap</h2>
+              <div class="weather-details">
+                ${weatherData.openWeatherMap.statusCode === 200 ? 
+                `<img src="https://openweathermap.org/img/wn/${weatherData.openWeatherMap.weather[0].icon}@2x.png" class = "weather-image">
+                <p><b>Temperature:</b> <span class="temperature">${weatherData.openWeatherMap.main.temp}°C</span></p>
+                <p><b>Weather:</b> <span class="weather-condition">${weatherData.openWeatherMap.weather[0].main}</span></p>
+                <p><b>Description:</b> <span class="weather-description">${weatherData.openWeatherMap.weather[0].description}</span></p>`
+                : `<img src="./assets/error-image.png" alt="Api Request Unsuccessful" class = "error-image">`
+                }
+              </div>
+            </div>
 
             <div class="weather-box">
-            <h2>Pirate Weather</h2>
-            ${weatherData.pirateWeather.statusCode === 200 ?
-            `<img  width = "72px" height = "96px" src ="./assets/${weatherData.pirateWeather.currently.icon}.png">
-            <p>Temperature: ${weatherData.pirateWeather.currently.temperature}°C</p>
-            <p>Weather: ${weatherData.pirateWeather.currently.summary}</p>
-            <p>Description: ${weatherData.pirateWeather.currently.windSpeed}</p>` :
-              `<img src = "./assets/error-image.png" alt = "Api Request Unsuccessful">`
-            }
-          </div>
+              <h2>WeatherBit</h2>
+              <div class = "weather-details">
+                ${weatherData.weatherBit.statusCode === 200 ?
+              `<img src=https://www.weatherbit.io/static/img/icons/${weatherData.weatherBit.data[0].weather.icon}.png class = "weather-image">
+              <p><b> Temperature:</b> <span class = "temperature">${weatherData.weatherBit.data[0].temp}°C</span></p>
+              <p><b>Weather:</b> <span class="weather-condition">${weatherData.weatherBit.data[0].weather.description}</span></p>
+              <p><b>AQI:</b><span class = "weather-description"> ${weatherData.weatherBit.data[0].aqi}</span></p>` : `<img src = "./assets/error-image.png" alt = "Api Request Unsuccessful" class = "error-image">`
+              }  
+              </div> 
+            </div>
 
+            <div class = "weather-box">
+              <h2> Tomorrow API</h2>
+              <div class = "weather-details">
+                ${weatherData.tomorrow.statusCode === 200 ?
+                `<img src ="./assets/${weatherData.tomorrow.timelines.minutely[0].values.weatherCode}.png" class = "weather-image">
+                <p><b> Temperature:</b> <span class = "temperature">${weatherData.tomorrow.timelines.minutely[0].values.temperature}°C</span></p>
+                <p><b>Humidity:</b> <span class="weather-condition">${weatherData.tomorrow.timelines.minutely[0].values.humidity}</span></p>
+                <p><b>WindSpeed:</b><span class = "weather-description"> ${weatherData.tomorrow.timelines.minutely[0].values.windSpeed}</p>` 
+                : `<img src = "./assets/error-image.png" alt = "Api Request Unsuccessful" class = "error-image">`
+                }   
+              </div>
+            </div>
+
+            <div class="weather-box">
+              <h2>Pirate Weather</h2>
+              <div class = "weather-details">
+                ${weatherData.pirateWeather.statusCode === 200 ?
+                `<img src ="./assets/${weatherData.pirateWeather.currently.icon}.png" class = "weather-image">
+                <p><b>Temperature:</b> <span class="temperature">${weatherData.pirateWeather.currently.temperature}°C</span></p>
+                <p><b>Weather:</b> <span class="weather-condition">${weatherData.pirateWeather.currently.summary}</span></p>
+                <p><b>WindSpeed:</b> <span class="weather-description">${weatherData.pirateWeather.currently.windSpeed}</span></p>`: `<img src = "./assets/error-image.png" alt = "Api Request Unsuccessful" class = "error-image">`
+                }
+              </div>
+            </div>
+
+          </div>
+          <script src="https://kit.fontawesome.com/90a3bdb97a.js" crossorigin="anonymous"></script>
         </body>
       </html>
     `;
     
     response.setHeader("Content-Type", "text/html");
     response.send(html);
-    },6000);
+    },15000);
 });
+
+app.post("/weatherapp",function(request,response){
+  response.redirect("/weatherapp");
+})
 
 app.listen(process.env.PORT || 3000, function(){
     console.log("Server is Running on Port 3000");
