@@ -1,9 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
-import https from "https";
 
 const app = express();
 
+// body-parser Middleware to parse url encoded body
 app.use(bodyParser.urlencoded({extended:true}));
 
 // To use local static files, such as images, style.css
@@ -11,15 +11,31 @@ app.use(express.static('public'));
 
 app.get("/weatherapp",function(request,response){
     response.sendFile("D:/Workplace/Projects/WeatherApp/index.html");
+    // response.sendFile(__dirname + "index.html");
 });
 
-app.post("/",function(request,response){
-    let cityName = request.body.city;
-    console.log(cityName);
-    let lat_long = " ";
+app.post("/",async function(request,response){
+
+  if (!request.body || !request.body.city) {
+    response.status(400).send("Missing city name in request body");
+    return;
+  }
+
+  let cityName = request.body.city;
+  // console.log(cityName);
+
+  // Validate the city name
+  if (typeof cityName !== "string" || cityName.trim() === "") {
+    response.status(400).send("Invalid city name");
+    return;
+  }
+
+  let lat_long = " "; // Initialize with a default value
+
+  // response.send(`City name: ${cityName}, Latitude and Longitude: ${lat_long}`);
 
     const apiId = "66685c4c61480343941491yac61f468";
-    const url = `https://geocode.maps.co/search?q=${cityName}&api_key=${apiId}`;
+    const geoAPI = `https://geocode.maps.co/search?q=${cityName}&api_key=${apiId}`;
 
     const APIKeys = {
       openWeatherMap: "f16726fe714ecaae4b0de2153eee210a",
@@ -27,44 +43,32 @@ app.post("/",function(request,response){
       weatherBit: "d359e8eb4b5f483ba435f2a0c95f2b64",
       tomorrow: "LwRLVEBT7gJEnOx48F2mauGzbIXf6Vwl"
     };
-  
+
     const weatherData = {};
 
-    // Using IIFE
-      (async function geoCodeAPI() {
-        const res = await fetch(url);
-        const data = await res.json();
-        console.log(data);
-        lat_long = data[0].lat + "," + data[0].lon;
-        console.log(lat_long);
-        
-        // To ensure that all API's called after geoCode API
-        const apiUrls = {
-          openWeatherMap: `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${APIKeys.openWeatherMap}&units=metric`,
-          weatherBit: `https://api.weatherbit.io/v2.0/current?city=${cityName}&key=${APIKeys.weatherBit}`,
-          pirateWeather: `https://api.pirateweather.net/forecast/${APIKeys.pirateWeather}/${lat_long}?&units=si`,
-          tomorrow: `https://api.tomorrow.io/v4/weather/forecast?location=${cityName}&apikey=${APIKeys.tomorrow}`
-        };
-
-        // Now call all Weather API's
-        (async function getWeatherData(){
-          for(let api of Object.keys(apiUrls)){
-            // const res = await https.get(apiUrls[api]);
-            let res = await fetch(apiUrls[api]);
-            let data = await res.json(); // Parse json into js object
-            console.log(res.status);
-            // Using spread operator ...
-            data = { ...data, statusCode: res.status}; // Add statusCode property to data object
-            console.log(apiUrls[api]);
-            console.log(data);
-            // console.log(data.sta)
-            weatherData[api] = data;
-          }
-        })();
-      })();
+    try {
+      const res = await fetch(geoAPI);
+      const data = await res.json();
+      lat_long = data[0].lat + "," + data[0].lon;
   
-    // Wait till all API's called  
-    setTimeout(function(){
+      const apiUrls = {
+        openWeatherMap: `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${APIKeys.openWeatherMap}&units=metric`,
+        weatherBit: `https://api.weatherbit.io/v2.0/current?city=${cityName}&key=${APIKeys.weatherBit}`,
+        pirateWeather: `https://api.pirateweather.net/forecast/${APIKeys.pirateWeather}/${lat_long}?&units=si`,
+        tomorrow: `https://api.tomorrow.io/v4/weather/forecast?location=${cityName}&apikey=${APIKeys.tomorrow}`
+      };
+  
+      const promises = Object.keys(apiUrls).map(api => fetch(apiUrls[api]));
+      const responses = await Promise.all(promises);
+      const dataPromises = responses.map(res => res.json());
+      const results = await Promise.all(dataPromises);
+  
+      results.forEach((data, index) => {
+        const api = Object.keys(apiUrls)[index];
+        data.statusCode = responses[index].status;
+        weatherData[api] = data;
+      });
+  
       const html = `
       <html>
         <head>
@@ -243,7 +247,11 @@ app.post("/",function(request,response){
     
     response.setHeader("Content-Type", "text/html");
     response.send(html);
-    },15000);
+  } catch (error) {
+    console.error(error);
+    response.status(500).send("Error occurred while fetching weather data");
+  }
+
 });
 
 app.post("/weatherapp",function(request,response){
