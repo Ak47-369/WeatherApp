@@ -1,5 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
+import getApiEndPoints from "./public/APIdata/apiEndPoints.js";
+import APIKeys from "./public/APIdata/apiKeys.js";
 
 const app = express();
 
@@ -33,31 +35,15 @@ app.post("/",async function(request,response){
   let lat_long = " "; // Initialize with a default value
 
   // response.send(`City name: ${cityName}, Latitude and Longitude: ${lat_long}`);
-
-    const apiId = "66685c4c61480343941491yac61f468";
-    const geoAPI = `https://geocode.maps.co/search?q=${cityName}&api_key=${apiId}`;
-
-    const APIKeys = {
-      openWeatherMap: "f16726fe714ecaae4b0de2153eee210a",
-      pirateWeather: "Q9Kj2H5UbMqb65FW25Y32EUNOOGT0fxf",
-      weatherBit: "d359e8eb4b5f483ba435f2a0c95f2b64",
-      tomorrow: "LwRLVEBT7gJEnOx48F2mauGzbIXf6Vwl"
-    };
-
-    const weatherData = {};
-
+ 
+  const weatherData = {};
+  const geoAPI = `https://geocode.maps.co/search?q=${cityName}&api_key=${APIKeys.geoAPI}`
     try {
       const res = await fetch(geoAPI);
       const data = await res.json();
       lat_long = data[0].lat + "," + data[0].lon;
-  
-      const apiUrls = {
-        openWeatherMap: `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${APIKeys.openWeatherMap}&units=metric`,
-        weatherBit: `https://api.weatherbit.io/v2.0/current?city=${cityName}&key=${APIKeys.weatherBit}`,
-        pirateWeather: `https://api.pirateweather.net/forecast/${APIKeys.pirateWeather}/${lat_long}?&units=si`,
-        tomorrow: `https://api.tomorrow.io/v4/weather/forecast?location=${cityName}&apikey=${APIKeys.tomorrow}`
-      };
-  
+      
+      const apiUrls = getApiEndPoints(cityName,lat_long);
       const promises = Object.keys(apiUrls).map(api => fetch(apiUrls[api]));
       const responses = await Promise.all(promises);
       const dataPromises = responses.map(res => res.json());
@@ -256,7 +242,7 @@ app.post("/",async function(request,response){
 
 app.post("/weatherapp",function(request,response){
   response.redirect("/weatherapp");
-})
+});
 
 app.listen(process.env.PORT || 3000, function(){
     console.log("Server is Running on Port 3000");
