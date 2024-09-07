@@ -41,8 +41,8 @@ app.post("/getWeatherData",async function(request,response){
         const api = Object.keys(apiUrls)[index];
         data.statusCode = responses[index].status;
 
-        console.log(api);
-        console.log(data);
+        // console.log(api);
+        // console.log(data);
 
         if (data.statusCode >= 400) {
           weatherData[api] = {

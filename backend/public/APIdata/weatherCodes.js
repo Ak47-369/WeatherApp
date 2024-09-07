@@ -1,3 +1,5 @@
+// Using these weather code to determine the weather from weather code in Tomorrow API
+
 const weatherCodes = {
     "0": "Unknown",
     "1000": "Clear, Sunny",
