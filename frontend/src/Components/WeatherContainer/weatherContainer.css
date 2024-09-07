@@ -1,0 +1,39 @@
+.weather-box-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .weather-box-container .weather-box {
+    flex: 1 0 25%;
+    margin: 10px;
+  }
+  
+  .weather-box-container .weather-box:nth-child(1) {
+    background-color: #f7f7f7;
+  }
+  
+  .weather-box-container .weather-box:nth-child(2) {
+    background-color: #e5e5e5;
+  }
+  
+  .weather-box-container .weather-box:nth-child(3) {
+    background-color: #d3d3d3;
+  }
+  
+  .weather-box-container .weather-box:nth-child(4) {
+    background-color: #c1c1c1;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .weather-box-container {
+      flex-direction: column;
+    }
+    .weather-box-container .weather-box {
+      flex: 1 0 100%;
+      margin: 10px 0;
+    }
+  }

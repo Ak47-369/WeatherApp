@@ -1,0 +1,52 @@
+
+.cityBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #f0f0f0; /* light gray background */
+  border-bottom: 1px solid #ccc; /* light gray border */
+  border-radius: 20px;
+}
+
+.cityBar h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 0;
+  text-align: center;
+  flex: 1;
+}
+
+.cityBar form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cityInput {
+  font-size: 18px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px 0 0 20px;
+  background-color: #fff; /* white background */
+  width: 200px;
+}
+
+.cityButton {
+  font-size: 18px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 0 20px 20px 0;
+  background-color: #4CAF50; /* green background */
+  color: #fff; /* white text */
+  cursor: pointer;
+}
+
+.cityButton:hover {
+  background-color: #3e8e41; /* darker green on hover */
+}
+
+.cityButton i {
+  margin-right: 10px;
+}
